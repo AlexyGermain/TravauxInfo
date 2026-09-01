@@ -40,5 +40,51 @@ namespace Restaurant.Tests
             //Assert
             Assert.Equal((decimal)prixAttendu, total, 1);
         }
+
+        [Fact]
+        public void LigneCommande_CodePlatVide_Erreur()
+        {
+            //Arrange
+            Action value = () => new LigneCommande("", "description", 0.0m, 0, 0m);
+
+            //Act / Assert
+            Assert.Throws<ArgumentException>(value);
+        }
+
+        [Theory]
+        //Pas de code
+        [InlineData("", "descriptionValide")]
+        //Pas de description
+        [InlineData("CodeBon", "")]
+        public void LigneCommande_ParamConstructeurStringInvalides_Erreur(
+            string code,
+            string description)
+        {
+            //Arrange
+            Action value = () => new LigneCommande(code, description, 2.0m, 1, 0.0m);
+
+            //Act / Assert
+            Assert.Throws<ArgumentException>(value);
+        }
+
+        [Theory]
+        //Prix unit négatif
+        [InlineData( -2.0, 1, 0.0)]
+        //Quantité nulle
+        [InlineData( 2.0, 0, 0.0)]
+        //Rabais
+        [InlineData( 2.0, 1, 101.0)]
+        [InlineData( 2.0, 1, -1.0)]
+        public void LigneCommande_ParamConstructeurNumeriqueInvalides_Erreur(
+            double prixUnit,
+            int quantite,
+            double rabais)
+        {
+            //Arrange
+            Action value = () => new LigneCommande("CodeBon", "DescriptionValide", (decimal)prixUnit, quantite, (decimal)rabais);
+
+            //Act / Assert
+            Assert.Throws<ArgumentOutOfRangeException>(value);
+        }
     }
 }
